@@ -24,7 +24,7 @@ for i in range(0, len(df.columns)):
 
 #remove nan (empty) values by using:
 itemset.remove(np.nan)
-
+print(itemset)
 #To make use of the apriori module given by mlxtend library, we need to convert the dataset accordingly. Apriori module requires a
 # dataframe that has either 0 and 1 or True and False as data.
 #Example:
@@ -36,14 +36,16 @@ itemset.remove(np.nan)
 
 #To do that, create a dictionary (labels) for each transaction, store the corresponding values for each item (e.g., {'Bread': 0, 'Milk': 1}) in that transaction,
 #and when is completed, append the dictionary to the list encoded_vals below (this is done for each transaction)
-#-->add your python code below
-
 encoded_vals = []
 for index, row in df.iterrows():
-
     labels = {}
-
+    for item in itemset:
+        if item in row.values:
+            labels[item] = 1
+        else:
+            labels[item] = 0
     encoded_vals.append(labels)
+
 
 #adding the populated list with multiple dictionaries to a data frame
 ohe_df = pd.DataFrame(encoded_vals)
@@ -59,12 +61,27 @@ rules = association_rules(freq_items, metric="confidence", min_threshold=0.6)
 #Confidence: 0.6666666666666666
 #Prior: 0.4380952380952381
 #Gain in Confidence: 52.17391304347825
-#-->add your python code below
+for index, row in rules.iterrows():
+    supportCount = 0
+    print(row['antecedents'].__str__().replace("frozenset({", "").replace("})", "") + " -> " + row['consequents'].__str__().replace("frozenset({", "").replace("})", ""))
+    print("Support: " + row['support'].__str__())
+    print("Confidence: " + row['confidence'].__str__())
+    for transaction in encoded_vals:
+        supported = True
+        for item in [x.strip() for x in list(row['consequents'])]:
+            if transaction[item] == 0:
+                supported = False
+            if not supported:
+                break
+        if supported:
+            supportCount += 1
+    prior = supportCount/len(encoded_vals) #-> encoded_vals is the number of transactions
+    print("Prior: " + str(prior))
+    print("Gain in Confidence: " + str(100*(row['confidence']-prior)/prior))
+    print("")
 
 #To calculate the prior and gain in confidence, find in how many transactions the consequent of the rule appears (the supporCount below). Then,
 #use the gain formula provided right after.
-#prior = suportCount/len(encoded_vals) -> encoded_vals is the number of transactions
-#print("Gain in Confidence: " + str(100*(rule_confidence-prior)/prior))
 #-->add your python code below
 
 #Finally, plot support x confidence
