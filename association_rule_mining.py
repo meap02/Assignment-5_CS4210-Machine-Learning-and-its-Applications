@@ -86,7 +86,7 @@ for index, row in rules.iterrows():
 
 #Finally, plot support x confidence
 plt.scatter(rules['support'], rules['confidence'], alpha=0.5)
-plt.xlabel('support')
-plt.ylabel('confidence')
+plt.xlabel('Support')
+plt.ylabel('Confidence')
 plt.title('Support vs Confidence')
 plt.show()
